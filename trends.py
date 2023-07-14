@@ -152,15 +152,18 @@ def make_sentiment(value):
     """
     assert value is None or (value >= -1 and value <= 1), 'Illegal value'
     "*** YOUR CODE HERE ***"
+    return value
 
 def has_sentiment(s):
     """Return whether sentiment s has a value."""
     "*** YOUR CODE HERE ***"
+    return s != None
 
 def sentiment_value(s):
     """Return the value of a sentiment s."""
     assert has_sentiment(s), 'No sentiment value'
     "*** YOUR CODE HERE ***"
+    return s
 
 def get_word_sentiment(word):
     """Return a sentiment representing the degree of positive or negative
