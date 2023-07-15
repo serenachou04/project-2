@@ -202,6 +202,15 @@ def analyze_tweet_sentiment(tweet):
     # You may change any of the lines below.
     average = make_sentiment(None)
     "*** YOUR CODE HERE ***"
+    sentiment_sum = float(0)
+    total_words = 0
+    for word in tweet_words(tweet): #iterate through words in tweet and sum up all words w/ sentiments and their sentiment values
+        if has_sentiment(get_word_sentiment(word)):
+            sentiment_sum = sentiment_sum + sentiment_value(get_word_sentiment(word))
+            total_words = total_words + 1
+    if total_words > 0:
+        average_sentiment = sentiment_sum / total_words
+        average = make_sentiment(average_sentiment)
     return average
 
 
@@ -232,6 +241,28 @@ def find_centroid(polygon):
     (1.0, 2.0, 0.0)
     """
     "*** YOUR CODE HERE ***"
+    lat_polygon = float(0)
+    lon_polygon = float(0)
+    area_polygon = float(0)
+        
+    for i in range(len(polygon) - 1):
+        p1 = polygon[i]
+        p2 = polygon[i + 1]
+        signed_area = (latitude(p1) * longitude(p2)) - (latitude(p2) * longitude(p1))
+        area_polygon = area_polygon + signed_area
+        lat_polygon = lat_polygon + float((latitude(p1) + latitude(p2)) * signed_area)
+        lon_polygon = lon_polygon + float((longitude(p1) + longitude(p2)) * signed_area)
+
+    area_polygon = 0.5 * area_polygon
+    if area_polygon == float(0):
+            centroid_latitude = float(latitude(polygon[0]))
+            centroid_longitude = float(longitude(polygon[0]))
+    else:
+            centroid_latitude = lat_polygon / (6 * area_polygon)
+            centroid_longitude = lon_polygon / (6 * area_polygon)
+    
+    return (centroid_latitude, centroid_longitude, abs(area_polygon))
+
 
 def find_state_center(polygons):
     """Compute the geographic center of a state, averaged over its polygons.
@@ -255,6 +286,21 @@ def find_state_center(polygons):
     -156.21763
     """
     "*** YOUR CODE HERE ***"
+    lat_polygon = float(0)
+    lon_polygon = float(0)
+    area_polygon = float(0)
+
+    for polygon in polygons:
+        centroid = find_centroid(polygon)
+        lat_polygon = lat_polygon + (centroid[0] * centroid[2])
+        lon_polygon = lon_polygon + (centroid[1] * centroid[2])
+        area_polygon = area_polygon + centroid[2]
+    if area_polygon == float(0):
+        return None
+    else:
+        final_lat = lat_polygon / area_polygon
+        final_lon = lon_polygon / area_polygon
+    return make_position(final_lat, final_lon)
 
 
 ###################################
