@@ -205,8 +205,9 @@ def analyze_tweet_sentiment(tweet):
     sentiment_sum = float(0)
     total_words = 0
     for word in tweet_words(tweet): #iterate through words in tweet and sum up all words w/ sentiments and their sentiment values
-        if has_sentiment(get_word_sentiment(word)):
-            sentiment_sum = sentiment_sum + sentiment_value(get_word_sentiment(word))
+        word_sentiment = get_word_sentiment(word)
+        if has_sentiment(word_sentiment):
+            sentiment_sum = sentiment_sum + sentiment_value(word_sentiment)
             total_words = total_words + 1
     if total_words > 0:
         average_sentiment = sentiment_sum / total_words
@@ -328,6 +329,19 @@ def group_tweets_by_state(tweets):
     """
     tweets_by_state = {}
     "*** YOUR CODE HERE ***"
+    for tweet in tweets:
+        tweet_position = tweet_location(tweet)
+        total_distance = float("inf") #initialize big distance to compare w/ smaller distances in loop
+        for postal_code, shape in us_states.items():
+            state_position = find_state_center(shape)
+            distance_between = geo_distance(tweet_position, state_position)
+            if distance_between < total_distance:
+                closest_state = postal_code
+                total_distance = distance_between
+        if closest_state not in tweets_by_state:
+            tweets_by_state[closest_state] = [tweet]
+        else:
+            tweets_by_state[closest_state].append(tweet)
     return tweets_by_state
 
 def average_sentiments(tweets_by_state):
@@ -344,6 +358,17 @@ def average_sentiments(tweets_by_state):
     """
     averaged_state_sentiments = {}
     "*** YOUR CODE HERE ***"
+    for closest_state, tweets in tweets_by_state.items():
+        total_sentiment = float(0)
+        number_tweets = float(0)
+        for tweet in tweets:
+            sentiment = analyze_tweet_sentiment(tweet)
+            if has_sentiment(sentiment):
+                total_sentiment = total_sentiment + sentiment_value(sentiment)
+                number_tweets = number_tweets + 1
+            if number_tweets > 0:
+                average_sentiment = total_sentiment / number_tweets
+                averaged_state_sentiments[closest_state] = average_sentiment
     return averaged_state_sentiments
 
 
